@@ -1,0 +1,160 @@
+version: 3.0
+name: OpenClaw Federation Constitution
+
+principles:
+  - federated_state
+  - bounded_authority
+  - explicit_sync
+  - local_autonomy_global_coherence
+
+roles:
+
+  founder:
+    type: human
+    authority:
+      decision: ultimate
+      write_state: none
+    permissions:
+      issue_commands: all_roles
+      approve_escalations: true
+
+  chief_of_staff:
+    type: ai
+    authority:
+      decision: integrative
+      write_state:
+        - /company/BOARD-ROOM/**
+    responsibilities:
+      - maintain_company_pulse
+      - integrate_department_reports
+      - detect_misalignment
+      - escalate_to_founder
+      - propagate_decisions
+
+  department_head:
+    type: ai
+    subclasses:
+      - CTO
+      - Head_of_Product
+      - Head_of_Sales
+      - Head_of_Finance
+      - Head_of_People
+    authority:
+      decision: local
+      write_state:
+        - /company/<DEPARTMENT>/**
+    responsibilities:
+      - manage_department_execution
+      - update_dept_state
+      - submit_weekly_report
+      - respond_to_direct_commands_locally
+
+  sub_agent:
+    type: ai
+    authority:
+      decision: none
+      write_state: none
+    responsibilities:
+      - assist_department_head
+
+write_permissions:
+  default:
+    read: all
+    write: none
+
+  overrides:
+    chief_of_staff:
+      write:
+        - /company/BOARD-ROOM/**
+    CTO:
+      write:
+        - /company/ENGINEERING/**
+    Head_of_Product:
+      write:
+        - /company/PRODUCT/**
+    Head_of_Sales:
+      write:
+        - /company/SALES/**
+    Head_of_Finance:
+      write:
+        - /company/FINANCE/**
+    Head_of_People:
+      write:
+        - /company/PEOPLE/**
+
+sync_protocol:
+  cadence: weekly
+  authority:
+    write_global: chief_of_staff
+    read_only:
+      - CTO
+      - Head_of_Product
+      - Head_of_Sales
+      - Head_of_Finance
+      - Head_of_People
+
+  inputs:
+    required_files:
+      - WEEKLY-REPORT.md
+
+  outputs:
+    updated_files:
+      - /company/BOARD-ROOM/COMPANY-PULSE.md
+      - /company/BOARD-ROOM/BOARD-DECISIONS.md
+
+weekly_report_schema:
+  required_sections:
+    - mission_alignment
+    - completed_work
+    - in_progress_work
+    - deviations
+    - risks_and_blockers
+    - local_decisions
+    - board_requests
+
+misalignment_detection:
+  triggers:
+    - reported_work_not_linked_to_company_goals
+    - unreported_deviations
+    - repeated_local_decisions_affecting_other_departments
+  severity_levels:
+    - informational
+    - warning
+    - escalation_required
+
+escalation_rules:
+  escalated_by: chief_of_staff
+  escalated_to: founder
+  required_when:
+    - material_goal_conflict
+    - budget_or_capacity_breach
+    - repeated_misalignment
+  resolution_record:
+    file: /company/BOARD-ROOM/BOARD-DECISIONS.md
+
+decision_propagation:
+  source_of_truth: /company/BOARD-ROOM/BOARD-DECISIONS.md
+  propagation_steps:
+    - update_company_pulse
+    - issue_directive_summary
+    - require_department_state_update
+
+guardrails:
+  cross_domain_writes: forbidden
+  silent_state_merge: forbidden
+  sync_skipping: forbidden
+  unreported_deviation: escalation_trigger
+
+invariants:
+  cognitive_vs_organizational_state:
+    rule: >
+      Cognitive files (SOUL.md, AGENTS.md, MEMORY.md, TOOLS.md, SELF-CHECK.md)
+      define agent behavior, values, and internal reasoning only and MUST NOT
+      be used to store, override, or substitute for organizational truth.
+      Organizational truth (goals, priorities, commitments, decisions, and
+      authority) exists exclusively in company/ state files and is authoritative
+      over any cognitive memory or narrative context.
+    enforcement:
+      - organizational_decisions_must_reference_company_state
+      - memory_or_agent_instructions_cannot_override_policy_or_state
+      - conflicts_resolved_in_favor_of_company_state

@@ -1,0 +1,11 @@
+# Global State Ledger
+# This file is the single source of truth for the agent's current state.
+# Update it whenever goals, constraints, conflicts, or predictions change.
+
+goals: []
+hypotheses: []
+constraints:
+  - "Ask before external or public actions"
+conflicts: []
+predictions: []
+last_update: ""

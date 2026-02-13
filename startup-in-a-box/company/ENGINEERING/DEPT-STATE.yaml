@@ -1,0 +1,37 @@
+version: 1.0
+department:
+  name: ENGINEERING
+  head_role: CTO
+  last_updated: 2026-02-12
+  update_owner: CTO
+
+mission:
+  statement: "Build and operate reliable product infrastructure that supports company goals."
+  current_focus: "One sentence describing Engineering focus."
+
+top_priorities: []
+
+roadmap:
+  milestones: []
+
+reliability:
+  service_health:
+    crash_rate_target: "under 1.0%"
+    crash_rate_current: "unknown"
+    incident_count_week: 0
+    top_incident: ""
+  tech_debt:
+    debt_items: []
+
+workstream_active: []
+
+capacity:
+  team_size: 0
+  available_weekly_hours: 0
+  utilization_estimate: 0.0
+  constraints: []
+
+risks_and_blockers: []
+deviations: []
+decisions_local: []
+requests_to_board_room: []
