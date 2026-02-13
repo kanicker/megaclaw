@@ -1,0 +1,28 @@
+# Executive State Ledger
+# Single source of truth for Chief of Staff mode.
+# Keep priorities to three. Keep everything else referenced and actionable.
+
+priorities:
+  - item: ""
+    why: ""
+    success_criteria: ""
+    due: ""
+    status: "active"
+  - item: ""
+    why: ""
+    success_criteria: ""
+    due: ""
+    status: "active"
+  - item: ""
+    why: ""
+    success_criteria: ""
+    due: ""
+    status: "active"
+
+commitments: []
+decisions_pending: []
+delegations: []
+stakeholders_tier1: []
+risks: []
+metrics: []
+last_update: ""

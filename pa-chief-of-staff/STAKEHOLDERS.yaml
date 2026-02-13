@@ -1,0 +1,11 @@
+# Stakeholders
+# Lightweight CRM list. Keep it short and updated.
+
+stakeholders:
+  - name: ""
+    organization: ""
+    role: ""
+    tier: "1"
+    last_touch: ""
+    next_touch: ""
+    notes: ""

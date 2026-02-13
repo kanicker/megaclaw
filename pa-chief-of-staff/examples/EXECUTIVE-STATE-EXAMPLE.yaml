@@ -1,0 +1,32 @@
+priorities:
+  - id: P1
+    title: Close Q1 revenue plan
+    why: Align GTM, budget, and targets
+    next_actions:
+      - "Draft one-page plan with assumptions"
+      - "Review with CFO"
+    due: 2026-02-20
+commitments:
+  - who: "Board"
+    what: "Send monthly update"
+    due: 2026-02-28
+    status: in_progress
+decisions_pending:
+  - decision: "Hire head of sales"
+    options:
+      - "Internal promotion"
+      - "External search"
+    recommendation: "Run parallel track for 2 weeks, decide"
+    by: 2026-02-19
+delegations:
+  - owner: "Ops lead"
+    deliverable: "Draft updated KPI dashboard"
+    due: 2026-02-18
+    cadence: "twice weekly check-in"
+risks:
+  - risk: "Pipeline softness in segment B"
+    severity: high
+    mitigation: "Reallocate SDR focus + launch offer"
+metrics:
+  weekly_pipeline: "target $1.2M"
+last_update: 2026-02-12

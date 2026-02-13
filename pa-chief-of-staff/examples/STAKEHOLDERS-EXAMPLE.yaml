@@ -1,0 +1,8 @@
+stakeholders:
+  - name: "Alex Rivera"
+    org: "Key customer"
+    role: "VP Operations"
+    tier: A
+    last_contact: 2026-02-05
+    next_touch: 2026-02-13
+    notes: "Wants stronger SLAs and clearer roadmap"
