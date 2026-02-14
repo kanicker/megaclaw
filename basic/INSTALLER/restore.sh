@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/openclaw-docker-workspace}"
+WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/.openclaw/workspace}"
 BACKUP_BASE="$HOME/openclaw-backups"
 
 echo "Workspace: $WORKSPACE_DIR"

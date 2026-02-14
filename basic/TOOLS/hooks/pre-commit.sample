@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# pre-commit.sample — optional
+# Installs: cp TOOLS/hooks/pre-commit.sample .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+
+set -euo pipefail
+
+# Run advisory decision linter on staged content (simple).
+python3 TOOLS/openclaw_lint_decisions.py MEMORY.md GLOBAL-STATE.yaml || {
+  echo "[pre-commit] Decision lint warnings found. Commit anyway if intentional."
+  exit 1
+}

@@ -1,74 +1,70 @@
-# Day in the Life (Basic) — End-to-End Example
+# Day in the Life (Basic) — Two Scenarios
 
-This is a single, complete cycle showing how the Basic kit is supposed to operate:
-prediction → action → unexpected outcome → error-delta → conflict detection → resolution.
+## Scenario 1: Compaction survival (the problem this kit solves)
 
-## Scenario
-User request: “Update the memory directory convention to be workspace-root/memory everywhere, and make the daily prediction script respect OPENCLAW_WORKSPACE_DIR.”
+User is 90 minutes into a coding session. The agent has been editing files, running tests, and tracking progress.
 
-### 0) Session start (agent loads state)
-Agent reads: AGENTS.md, SOUL.md, MEMORY.md, GLOBAL-STATE.yaml, PREDICTION-PROTOCOL.md, SELF-CHECK.md, CONSISTENCY-RESOLVER.md.
+### What happens without this kit:
+- Context hits ~180k tokens. Compaction triggers.
+- Agent loses: which file it was editing, what tests passed, what the last error was, what the user's goal was.
+- User: "Continue where you left off." Agent: "I'm not sure what we were working on. Could you remind me?"
+- User is frustrated. Repeats 20 minutes of context. Cycle repeats.
 
-### 1) Preflight: log prediction (GLOBAL-STATE.yaml)
-Append to `predictions`:
+### What happens with this kit:
 
-- date: 2026-02-12
-  action: "Standardize memory path to $OPENCLAW_WORKSPACE_DIR/memory and update daily-prediction.sh accordingly"
-  expected: "All docs and scripts reference the same memory directory; daily script works on macOS and Linux"
-  risk: med
+**At ~152k tokens** (earlier threshold from recommended config):
+- Pre-compaction flush triggers with kit-aware prompt.
+- Agent writes to `memory/2026-02-14.md`:
+  - Working on: refactoring auth module in `src/auth/handler.ts`
+  - Current step: test 4/7 passing, fixing JWT validation
+  - Last error: `TypeError: token.split is not a function` line 42
+  - Files touched: handler.ts, auth.test.ts, jwt-utils.ts
+- Agent updates GLOBAL-STATE.yaml:
+  - prediction P3 (refactor auth module): status partial, 4/7 tests passing
+  - no new conflicts
 
-SELF-CHECK passes:
-- prediction logged ✅
-- conflicts cleared ✅
-- state loaded ✅
-- safety check ✅ (no destructive external actions)
+**After compaction:**
+- Conversation history is summarized. Details lost from context.
+- But: GLOBAL-STATE.yaml is on disk. Daily memory log is on disk. Both survive.
+- Agent re-reads GLOBAL-STATE.yaml and `memory/2026-02-14.md`.
+- Agent: "Picking up where we left off — we're refactoring the auth module, 4/7 tests passing, last issue was a TypeError on line 42 of handler.ts. Let me look at that."
+- Session continues without the user repeating anything.
 
-### 2) Act: change files
-Action taken:
-- Update daily-prediction.sh to resolve workspace dir using OPENCLAW_WORKSPACE_DIR with a default fallback.
-- Update any doc references that still point to ~/.openclaw/memory.
+### What happens when the flush fails:
+- Flush is skipped (sandbox has read-only workspace, or compaction fires between turns).
+- Agent finds itself mid-conversation with vague context. Triggers recovery protocol.
+- Step 1: reads GLOBAL-STATE.yaml → finds prediction P3 for auth refactor, status "in_progress."
+- Step 2: reads `memory/2026-02-14.md` → finds earlier entry from the proactive working state save (written 20 minutes ago during the session): "refactoring auth module, 2/7 tests passing, working on JWT validation."
+- Step 3: runs `memory_search("auth handler refactor JWT")` → finds additional context from a prior session about the JWT library choice.
+- Step 4: announces to user: "I recovered most of my context. We're refactoring the auth module — my last saved state was 2/7 tests passing on JWT validation. I may have made more progress since then. Can you confirm where we are?"
+- Recovery is partial but functional. The user fills in one detail instead of repeating 20 minutes of work.
 
-### 3) Postflight: unexpected outcome
-What happened:
-- The script now resolves WORKSPACE_DIR, but a doc still references the old location, creating an inconsistency.
 
-### 4) Error-Delta (ERROR-DELTA-UPDATER.md format)
-What we predicted:
-- All docs and scripts would reference the same memory directory.
+## Scenario 2: Decision conflict detection
 
-What happened:
-- daily-prediction.sh uses $OPENCLAW_WORKSPACE_DIR/memory, but DAILY-PREDICTIONS.md still mentions ~/.openclaw/memory.
+User request: "Add a goal to automate vendor outreach for Q2."
 
-Delta update:
-- Fix DAILY-PREDICTIONS.md to match the standard.
-- Add a consistency check note: “Docs must match scripts for memory paths.”
+### 1) Classify and predict
+Action classification: **Structural** (modifying GLOBAL-STATE.yaml).
 
-### 5) Consistency Resolver: log conflict and resolve
-Log a conflict to GLOBAL-STATE.yaml under `conflicts`:
+Level 2 prediction recorded:
+- id: P1, action: "Add vendor outreach goal", expected: "clean state update", risk: low
 
-- date: 2026-02-12
-  conflict: "Memory path mismatch between DAILY-PREDICTIONS.md and daily-prediction.sh"
-  impact: "Users may create memory files in the wrong location"
-  status: open
+### 2) Act
+- Added goal G2: "Automate Q2 vendor outreach"
+- Updated `last_update`
 
-Resolution:
-- Update DAILY-PREDICTIONS.md to reference $OPENCLAW_WORKSPACE_DIR/memory with fallback default.
-- Mark conflict resolved.
+### 3) Postflight: conflict detected
+Existing constraint K1: "Ask before external or public actions"
+Vendor outreach requires sending external emails → conflicts with K1.
 
-Update conflict status:
+### 4) Log conflict, apply policy
+Conflict X1 logged in GLOBAL-STATE.yaml:
+- title: "Vendor outreach conflicts with external action constraint"
+- execution_policy: analysis_allowed_execution_blocked
+- status: open
 
-- date: 2026-02-12
-  conflict: "Memory path mismatch between DAILY-PREDICTIONS.md and daily-prediction.sh"
-  impact: "Users may create memory files in the wrong location"
-  status: resolved
-  resolution: "Docs updated to match script and workspace-root convention"
-
-### 6) Final state update (GLOBAL-STATE.yaml)
-- Add a constraint:
-  - "All path conventions must be workspace-scoped; no user-home hidden paths unless explicitly configured."
-- Update last_update timestamp.
-
-### 7) Closeout message (to user)
-- Briefly state what changed.
-- Provide the updated path convention.
-- Mention that a conflict was detected and resolved.
+### 5) Report to user
+- Goal added. Conflict detected: vendor outreach requires external communication, which is constrained.
+- Analysis and planning can proceed. Sending emails is blocked pending your decision.
+- Options: relax the constraint for vendor outreach, or approve each outreach individually.
