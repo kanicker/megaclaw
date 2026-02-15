@@ -38,18 +38,18 @@
       compaction: {
         mode: "default",
 
-        // ── Standard tier (default) ──
-        reserveTokensFloor: 20000,
+        // ── Standard tier (uncomment this, comment out Heavy Tools) ──
+        // reserveTokensFloor: 20000,
 
-        // ── Heavy Tools tier (uncomment this, comment out Standard) ──
-        // reserveTokensFloor: 40000,
+        // ── Heavy Tools tier ──
+        reserveTokensFloor: 40000,
 
         // Pre-compaction memory flush: the agent saves durable context
         // to memory files BEFORE compaction summarizes the conversation.
         // This is the #1 fix for "my agent forgot what it was doing."
         memoryFlush: {
           enabled: true,
-          softThresholdTokens: 4000,   // Standard. Use 8000 for Heavy Tools tier.
+          softThresholdTokens: 8000,
 
           // Kit-aware flush prompts — the agent saves decisions and
           // working state to GLOBAL-STATE.yaml and daily memory,
