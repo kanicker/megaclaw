@@ -1,6 +1,34 @@
 # Changelog — OpenClaw Cognitive Upgrade Kit (Basic)
 
 
+## v3.2.0 (2026-02-15)
+
+Memory quality and session awareness release. v3.1 added compaction survival infrastructure. v3.2 adds structured memory guidance and runtime context monitoring so the agent writes better memory and knows when to save before compaction hits.
+
+### Structured memory taxonomy
+- AGENTS.md "Writing memory" section rewritten with three-tier taxonomy: episodic (daily logs — what happened), semantic (MEMORY.md — what I know), procedural (named workspace files — how to do things). Maps onto existing file structure — no new directories, no migration needed.
+- Each tier includes guidance on when to write, what to write, and when to retrieve.
+- Writing discipline rules: don't duplicate across tiers, distill episodic into semantic when durable, prune MEMORY.md at ~200 lines.
+- HEARTBEAT.md memory upkeep now includes episodic-to-semantic promotion during review and MEMORY.md size management.
+
+### Context pressure monitor (new)
+- Added `TOOLS/openclaw_context_monitor.py` — estimates token pressure from injected workspace files (kernel files, GLOBAL-STATE, daily memory, addenda) against the context window.
+- `check` command returns exit code 0 (safe), 1 (warning at 15%), 2 (critical at 25%) for heartbeat integration.
+- `report` command shows detailed breakdown by file category with recommendations.
+- Supports `--json` output for scripted heartbeats, `--context-window` for non-200k models, custom `--warn` and `--critical` thresholds.
+- Complements the compaction diagnostics tool: monitor runs during sessions to trigger proactive saves, diagnostics runs after to measure how well compaction survival worked.
+- HEARTBEAT.md session health now references the context monitor as the preferred check.
+
+### Why this matters
+- Without the taxonomy, agents dump everything into MEMORY.md or daily logs with no structure. Over weeks, memory files become noisy and retrieval degrades. The taxonomy gives the agent a decision framework for every write.
+- Without the context monitor, the agent only discovers context pressure reactively (compaction happens, then recovery). The monitor catches growing files early, before they crowd out conversation context.
+
+### File summary
+- Added: TOOLS/openclaw_context_monitor.py (1 file)
+- Modified: AGENTS.md, HEARTBEAT.md, VERSION, .openclaw-kit, CHANGELOG.md (5 files)
+- Total files: 34 (was 33)
+
+
 ## v3.1.0 (2026-02-14)
 
 Infrastructure release. v3.0 built the governance layer; v3.1 adds the infrastructure that prevents the problems OpenClaw users actually hit.

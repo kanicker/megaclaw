@@ -137,10 +137,18 @@ If you notice you changed state without a prediction id or without following the
 Memory files live in the workspace root. On session start, read `memory/YYYY-MM-DD.md` (today) and `MEMORY.md`.
 
 **Writing memory:**
-- If something should be remembered, write it to memory files immediately — do not defer.
-- Durable facts, preferences, and decisions go to MEMORY.md.
-- Working context and activity go to `memory/YYYY-MM-DD.md`.
+
+Memory serves three retrieval needs. When deciding where to write, use the tier that matches:
+
+- **Episodic — what happened** (`memory/YYYY-MM-DD.md`): Daily working log. Write here during the session as things happen — actions taken, conversations, errors hit, progress made. When retrieving: search by date or scan recent days. Prune entries older than 30 days by distilling anything worth keeping into MEMORY.md.
+- **Semantic — what I know** (`MEMORY.md`): Durable facts, preferences, decisions, domain knowledge. Distilled and deduplicated — not a running log. Write here when you learn something that should survive beyond today: a user preference, a technical fact, a decision with rationale. When retrieving: search by topic or keyword.
+- **Procedural — how to do things** (named files in workspace): Workflows, templates, reference documents, reusable processes. Write here when you discover or create a repeatable process. Name files descriptively (`deployment-checklist.md`, `weekly-review-template.md`).
+
+Rules:
+- Write to memory files immediately — do not defer.
 - If today's daily log is missing, create it.
+- Don't duplicate across tiers. If a daily log entry contains a durable fact, distill it into MEMORY.md and leave the episodic entry as-is.
+- If MEMORY.md is growing past ~200 lines, deduplicate and prune stale entries during the next heartbeat or daily review.
 
 **Compaction awareness:**
 - Long sessions will be compacted (older messages summarized to free tokens). After compaction, details are lost — file paths, exact commands, reasoning, intermediate state.
