@@ -1,0 +1,3 @@
+overlay: multiagent
+version: 0.2.0
+requires: basic >= 3.1.0

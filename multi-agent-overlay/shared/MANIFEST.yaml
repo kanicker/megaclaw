@@ -1,0 +1,43 @@
+# MANIFEST.yaml — Agent Roster and Coordination Ledger
+# This file tracks which agents exist, what they do, and cross-agent state.
+# All agents read this on session start.
+
+hub: ""
+  # agent_id of the default/coordinating agent (e.g., "cos")
+
+agents: []
+  # - agent_id: "cos"
+  #   role: "Chief of Staff — coordination, priorities, decisions"
+  #   status: active
+  # - agent_id: "research"
+  #   role: "Research — literature review, synthesis, analysis"
+  #   status: active
+  # - agent_id: "dev"
+  #   role: "Development — architecture, implementation, testing"
+  #   status: active
+
+active_priorities: []
+  # - id: P-001
+  #   title: ""
+  #   owner: ""        # agent_id responsible for tracking
+  #   due: ""
+  #   agents_involved: []
+
+cross_agent_decisions: []
+  # - id: XD-2026-02-14-001
+  #   summary: ""
+  #   affects: []
+  #   status: ACTIVE
+
+pending_requests: []
+  # - id: REQ-research-2026-02-14-001
+  #   from: ""
+  #   subject: ""
+  #   urgency: ""
+
+conflicts: []
+  # - description: ""
+  #   between: []
+  #   status: open | resolved
+
+last_update: ""
