@@ -1,13 +1,28 @@
-# Decisions Log
+# DECISIONS.md — Decision Register (View)
 
-Use this as an immutable log. Add one entry per decision.
+> ⚠️ **This is a curated view, not the canonical register.**
+> The authoritative record lives in GLOBAL-STATE.yaml under `decisions`.
+> This file exists for quick human reference only.
+
+---
 
 ## Template
-- Date:
-- Decision:
-- Owner:
-- Context:
-- Options considered:
-- Rationale:
-- Reversible: yes/no
-- Follow up / review date:
+
+```
+### D-YYYY-MM-DD-NNN: [Title]
+- **Decided by:** [who]
+- **Date:** [when]
+- **Context:** [brief context]
+- **Options considered:** [list]
+- **Rationale:** [why this option]
+- **Reversible:** yes/no
+- **Review date:** [when to revisit]
+- **Status:** ACTIVE / SUPERSEDED
+- **Superseded by:** [link if applicable]
+```
+
+---
+
+## Log
+
+<!-- Add entries below. Most recent first. -->

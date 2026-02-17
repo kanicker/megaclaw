@@ -1,15 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PRODUCT_NAME="OpenClaw Cognitive Upgrade Kit (Basic)"
-REPO_URL="https://github.com/openclaw/openclaw.git"
-INSTALL_DIR="$HOME/openclaw-docker"
-CONFIG_DIR="$HOME/.openclaw-docker"
-WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/openclaw-docker-workspace}"
-GATEWAY_PORT="18799"
-BRIDGE_PORT="18800"
-
+PRODUCT_NAME="OpenClaw PA / Chief of Staff Kit v3"
+WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/.openclaw/workspace}"
 FORCE=0
+
 if [ "${1:-}" = "--force" ]; then
   FORCE=1
   shift
@@ -23,132 +18,150 @@ info() { printf "[info] %s\n" "$1"; }
 warn() { printf "[warn] %s\n" "$1"; }
 err()  { printf "[error] %s\n" "$1"; }
 
-copy_tree() {
-  # cp -a is preferred; fall back to cp -R -p for older BSD cp variants
-  local src="$1"
-  local dst="$2"
-  if cp -a "$src" "$dst" 2>/dev/null; then
-    return 0
+copy_if_missing() {
+  local src="$1" dst="$2"
+  if [ ! -f "$dst" ]; then
+    info "Installing: $(basename "$dst")"
+    cp "$src" "$dst"
+  elif [ "$FORCE" -eq 1 ]; then
+    info "Upgrading: $(basename "$dst")"
+    cp "$src" "$dst"
   fi
-  cp -R -p "$src" "$dst"
+}
+
+copy_always() {
+  local src="$1" dst="$2"
+  info "Installing: $(basename "$dst")"
+  cp "$src" "$dst"
 }
 
 bold "$PRODUCT_NAME — Installer"
 if [ "$FORCE" -eq 1 ]; then
-  warn "Force mode enabled: kit-owned files will be overwritten (user-editable files will not)."
+  warn "Force mode: kit-owned files will be overwritten. User-editable files will not."
 fi
 
-# 1) Check Docker
-if ! command -v docker >/dev/null 2>&1; then
-  err "Docker not found. Install Docker Desktop first: https://www.docker.com/products/docker-desktop/"
+# --- Step 1: Check Basic v3.2 prerequisite ---
+if [ ! -f "$WORKSPACE_DIR/.openclaw-kit" ]; then
+  err "Basic kernel not found at $WORKSPACE_DIR"
+  err "Install OpenClaw Basic v3.2 first, then re-run this installer."
   exit 1
 fi
 
-# 2) Clone repo if missing
-if [ ! -d "$INSTALL_DIR" ]; then
-  info "Cloning OpenClaw repo to $INSTALL_DIR"
-  git clone "$REPO_URL" "$INSTALL_DIR"
-else
-  info "OpenClaw repo already exists at $INSTALL_DIR"
+BASIC_KIT=$(grep -E "^kit:" "$WORKSPACE_DIR/.openclaw-kit" | awk '{print $2}' || echo "")
+if [ "$BASIC_KIT" != "basic" ] && [ "$BASIC_KIT" != "executive-cos" ]; then
+  err "Expected Basic kit at $WORKSPACE_DIR, found: $BASIC_KIT"
+  err "Install OpenClaw Basic v3.2 first."
+  exit 1
 fi
 
-# 3) Create dirs
-mkdir -p "$CONFIG_DIR" "$WORKSPACE_DIR"
+info "Basic kernel detected at $WORKSPACE_DIR"
 
-# 3a) Backup existing workspace snapshot (before any changes)
+# --- Step 2: Backup existing workspace ---
 BACKUP_BASE="$HOME/openclaw-backups"
-BACKUP_DIR="$BACKUP_BASE/$(date +%Y%m%d-%H%M%S)"
+BACKUP_DIR="$BACKUP_BASE/cos-$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$BACKUP_BASE"
+
 if [ -d "$WORKSPACE_DIR" ] && [ "$(ls -A "$WORKSPACE_DIR" 2>/dev/null || true)" ]; then
-  info "Backing up existing workspace to $BACKUP_DIR"
+  info "Backing up workspace to $BACKUP_DIR"
   mkdir -p "$BACKUP_DIR"
-  copy_tree "$WORKSPACE_DIR/." "$BACKUP_DIR/"
-  info "Backup complete: $BACKUP_DIR"
-else
-  info "No existing workspace contents to back up"
+  cp -R "$WORKSPACE_DIR/." "$BACKUP_DIR/"
+  info "Backup complete"
 fi
 
-# 3b) Install kit-owned files (overwrite only in --force mode)
-KIT_OWNED=(PREDICTION-PROTOCOL.md ERROR-DELTA-UPDATER.md CONSISTENCY-RESOLVER.md SELF-CHECK.md SAFETY-PRINCIPLES.md BENCHMARK-HARNESS.md MEMORY-SYSTEM-GUIDE.md GLOBAL-STATE-SCHEMA.md HEARTBEAT.md README-START-HERE.md CHANGELOG.md VERSION SECURITY.md)
+# --- Step 3: Create directories ---
+mkdir -p "$WORKSPACE_DIR/roles"
+mkdir -p "$WORKSPACE_DIR/workflows"
+mkdir -p "$WORKSPACE_DIR/briefings"
+mkdir -p "$WORKSPACE_DIR/examples"
+
+# --- Step 4: Install kit-owned files (overwrite on --force) ---
+KIT_OWNED=(
+  AGENTS-COS.md
+  SOUL-COS.md
+  STATE-CONTRACT.md
+  EXECUTIVE-STATE-SCHEMA.md
+  DECISIONS.md
+  COMMS-DRAFTS.md
+  MEETINGS.md
+  README-COS.md
+  CHANGELOG.md
+  MIGRATION-FROM-V2.md
+  VERSION
+)
+
 for f in "${KIT_OWNED[@]}"; do
   if [ -f "$KIT_DIR/$f" ]; then
     if [ "$FORCE" -eq 1 ]; then
-      info "Upgrading kit-owned file: $f"
-      cp "$KIT_DIR/$f" "$WORKSPACE_DIR/$f"
+      copy_always "$KIT_DIR/$f" "$WORKSPACE_DIR/$f"
     else
-      if [ ! -f "$WORKSPACE_DIR/$f" ]; then
-        info "Installing kit-owned file: $f"
-        cp "$KIT_DIR/$f" "$WORKSPACE_DIR/$f"
-      fi
+      copy_if_missing "$KIT_DIR/$f" "$WORKSPACE_DIR/$f"
     fi
   fi
 done
 
-# 3c) Install user-editable files (never overwrite)
-USER_EDITABLE=(AGENTS.md SOUL.md USER.md TOOLS.md MEMORY.md GLOBAL-STATE.yaml AUDIT-LOG.md)
+# --- Step 5: Install user-editable files (never overwrite) ---
+USER_EDITABLE=(
+  EXECUTIVE-STATE.yaml
+  STAKEHOLDERS.yaml
+)
+
 for f in "${USER_EDITABLE[@]}"; do
   if [ -f "$KIT_DIR/$f" ] && [ ! -f "$WORKSPACE_DIR/$f" ]; then
-    info "Installing user-editable file: $f"
+    info "Installing user-editable: $f"
     cp "$KIT_DIR/$f" "$WORKSPACE_DIR/$f"
   fi
 done
 
-# 3d) Copy directories
-DIRS_TO_COPY=(examples benchmarks)
-for d in "${DIRS_TO_COPY[@]}"; do
-  if [ -d "$KIT_DIR/$d" ]; then
-    mkdir -p "$WORKSPACE_DIR/$d"
-    if [ "$FORCE" -eq 1 ]; then
-      info "Upgrading directory: $d"
-      cp -R "$KIT_DIR/$d/." "$WORKSPACE_DIR/$d/"
-    else
-      # Copy only missing items to avoid overwriting user edits
-      for item in "$KIT_DIR/$d"/*; do
-        name="$(basename "$item")"
-        if [ ! -e "$WORKSPACE_DIR/$d/$name" ]; then
-          cp -R "$item" "$WORKSPACE_DIR/$d/$name"
-        fi
-      done
-    fi
+# --- Step 6: Install role modules ---
+for f in "$KIT_DIR"/roles/*.md; do
+  name="$(basename "$f")"
+  if [ "$FORCE" -eq 1 ]; then
+    copy_always "$f" "$WORKSPACE_DIR/roles/$name"
+  else
+    copy_if_missing "$f" "$WORKSPACE_DIR/roles/$name"
   fi
 done
 
-# 3e) Write kit manifest (always overwrite)
-VERSION="$(cat "$KIT_DIR/VERSION" 2>/dev/null || echo "unknown")"
+# --- Step 7: Install workflow guides ---
+for f in "$KIT_DIR"/workflows/*.md; do
+  name="$(basename "$f")"
+  if [ "$FORCE" -eq 1 ]; then
+    copy_always "$f" "$WORKSPACE_DIR/workflows/$name"
+  else
+    copy_if_missing "$f" "$WORKSPACE_DIR/workflows/$name"
+  fi
+done
+
+# --- Step 8: Install examples ---
+for f in "$KIT_DIR"/examples/*; do
+  name="$(basename "$f")"
+  if [ ! -e "$WORKSPACE_DIR/examples/$name" ]; then
+    cp "$f" "$WORKSPACE_DIR/examples/$name"
+  fi
+done
+
+# --- Step 9: Update kit manifest ---
+VERSION="$(cat "$KIT_DIR/VERSION" 2>/dev/null || echo "3.0.0")"
 INSTALLED="$(date +"%Y-%m-%dT%H:%M:%S%z")"
 cat > "$WORKSPACE_DIR/.openclaw-kit" <<EOF
-kit: basic
+kit: executive-cos
 version: $VERSION
+requires: basic >= 3.1.0
 installed: $INSTALLED
 EOF
-info "Wrote kit manifest: $WORKSPACE_DIR/.openclaw-kit"
+info "Updated kit manifest"
 
-# 3f) Bootstrap memory files (workspace root)
-mkdir -p "$WORKSPACE_DIR/memory"
-touch "$WORKSPACE_DIR/MEMORY.md"
-touch "$WORKSPACE_DIR/memory/$(date +%Y-%m-%d).md"
-
-# 4) Write .env for compose
-cat > "$INSTALL_DIR/.env" <<ENV
-OPENCLAW_CONFIG_DIR=$CONFIG_DIR
-OPENCLAW_WORKSPACE_DIR=$WORKSPACE_DIR
-OPENCLAW_GATEWAY_PORT=$GATEWAY_PORT
-OPENCLAW_BRIDGE_PORT=$BRIDGE_PORT
-OPENCLAW_GATEWAY_TOKEN=change-me-after-install
-ENV
-
-# 5) Start gateway
-cd "$INSTALL_DIR"
-info "Starting gateway on ports $GATEWAY_PORT/$BRIDGE_PORT"
-docker compose up -d openclaw-gateway
-
-# 6) Run setup (non-interactive check)
-info "Running setup"
-docker compose run --rm openclaw-cli setup
-
-bold "Done."
-info "Dashboard: http://127.0.0.1:${GATEWAY_PORT}/"
+# --- Done ---
+bold "Installation complete."
+echo ""
 info "Workspace: $WORKSPACE_DIR"
-info "Backup:   $BACKUP_DIR"
-info "To restore a backup, use: $KIT_DIR/INSTALLER/restore.sh"
-info "Optional: update OPENCLAW_GATEWAY_TOKEN in $INSTALL_DIR/.env"
+info "Backup:    $BACKUP_DIR"
+echo ""
+bold "Quick start:"
+echo "  1. Edit EXECUTIVE-STATE.yaml with your top 3 priorities"
+echo "  2. Edit STAKEHOLDERS.yaml with your key relationships"
+echo "  3. Add the injection directive to AGENTS.md (see README-COS.md)"
+echo "  4. Start a session — the agent will auto-load CoS and run a daily pulse"
+echo ""
+info "See README-COS.md for full documentation."
+info "Upgrading from v2? See MIGRATION-FROM-V2.md."

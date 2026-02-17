@@ -1,11 +1,14 @@
-# Stakeholders
-# Lightweight CRM list. Keep it short and updated.
+# STAKEHOLDERS.yaml — Relationship Index
+# ⚠️  This is a reference index. Real commitments to stakeholders go to GLOBAL-STATE.yaml.
+#
+# Tiers: A (high-touch, strategic), B (regular contact), C (low-frequency, inform only)
+# Keep next_touch current. The daily pulse will surface overdue touches.
 
 stakeholders:
-  - name: ""
-    organization: ""
-    role: ""
-    tier: "1"
-    last_touch: ""
-    next_touch: ""
-    notes: ""
+  # - name: ""
+  #   organization: ""
+  #   role: ""
+  #   tier: "A"
+  #   last_touch: ""
+  #   next_touch: ""
+  #   context: ""

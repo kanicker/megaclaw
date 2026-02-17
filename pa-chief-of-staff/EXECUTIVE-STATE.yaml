@@ -1,28 +1,63 @@
-# Executive State Ledger
-# Single source of truth for Chief of Staff mode.
-# Keep priorities to three. Keep everything else referenced and actionable.
+# EXECUTIVE-STATE.yaml — Executive Convenience Index
+# ⚠️  This file is a CONVENIENCE INDEX. Canonical commitments live in GLOBAL-STATE.yaml.
+#     If this file conflicts with GLOBAL-STATE, GLOBAL-STATE wins. See STATE-CONTRACT.md.
+#
+# Keep priorities to three. Keep everything actionable and time-bounded.
 
 priorities:
-  - item: ""
+  - id: ""
+    title: ""
     why: ""
     success_criteria: ""
     due: ""
     status: "active"
-  - item: ""
+  - id: ""
+    title: ""
     why: ""
     success_criteria: ""
     due: ""
     status: "active"
-  - item: ""
+  - id: ""
+    title: ""
     why: ""
     success_criteria: ""
     due: ""
     status: "active"
 
 commitments: []
+  # - who: ""
+  #   what: ""
+  #   due: ""
+  #   status: ""
+  #   global_state_ref: ""  # links to decision ID in GLOBAL-STATE
+
 decisions_pending: []
+  # - decision: ""
+  #   options: []
+  #   recommendation: ""
+  #   by: ""
+  #   stakes: ""
+
 delegations: []
-stakeholders_tier1: []
+  # - owner: ""
+  #   deliverable: ""
+  #   due: ""
+  #   cadence: ""
+
+stakeholders_active: []
+  # - name: ""
+  #   tier: ""
+  #   next_touch: ""
+
 risks: []
-metrics: []
+  # - risk: ""
+  #   severity: ""
+  #   mitigation: ""
+  #   owner: ""
+
+cadence:
+  # - name: ""
+  #   frequency: ""
+  #   next: ""
+
 last_update: ""

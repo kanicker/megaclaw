@@ -1,32 +1,63 @@
+# EXECUTIVE-STATE.yaml — Example (populated)
+# ⚠️  This file is a CONVENIENCE INDEX. Canonical commitments live in GLOBAL-STATE.yaml.
+
 priorities:
   - id: P1
-    title: Close Q1 revenue plan
-    why: Align GTM, budget, and targets
-    next_actions:
-      - "Draft one-page plan with assumptions"
-      - "Review with CFO"
-    due: 2026-02-20
+    title: "Close Q1 revenue plan"
+    why: "Align GTM, budget, and targets before board meeting"
+    success_criteria: "One-page plan approved by CFO"
+    due: "2026-02-20"
+    status: "active"
+  - id: P2
+    title: "Finalize head of sales hiring decision"
+    why: "Revenue gap widens every week without a leader"
+    success_criteria: "Offer extended or internal promotion announced"
+    due: "2026-02-19"
+    status: "active"
+  - id: P3
+    title: "Send board update draft"
+    why: "Monthly obligation, sets tone for next fundraise"
+    success_criteria: "Draft reviewed by COO, sent to board"
+    due: "2026-02-28"
+    status: "active"
+
 commitments:
   - who: "Board"
     what: "Send monthly update"
-    due: 2026-02-28
-    status: in_progress
+    due: "2026-02-28"
+    status: "in_progress"
+    global_state_ref: "D-2026-01-15-001"
+
 decisions_pending:
   - decision: "Hire head of sales"
-    options:
-      - "Internal promotion"
-      - "External search"
-    recommendation: "Run parallel track for 2 weeks, decide"
-    by: 2026-02-19
+    options: ["Internal promotion", "External search"]
+    recommendation: "Run parallel track for 2 weeks, then decide"
+    by: "2026-02-19"
+    stakes: "High — directly impacts Q2 pipeline"
+
 delegations:
   - owner: "Ops lead"
     deliverable: "Draft updated KPI dashboard"
-    due: 2026-02-18
+    due: "2026-02-18"
     cadence: "twice weekly check-in"
+
+stakeholders_active:
+  - name: "Alex Rivera"
+    tier: "A"
+    next_touch: "2026-02-13"
+
 risks:
   - risk: "Pipeline softness in segment B"
-    severity: high
-    mitigation: "Reallocate SDR focus + launch offer"
-metrics:
-  weekly_pipeline: "target $1.2M"
-last_update: 2026-02-12
+    severity: "high"
+    mitigation: "Reallocate SDR focus + launch promotional offer"
+    owner: "VP Sales (interim)"
+
+cadence:
+  - name: "CFO sync"
+    frequency: "weekly"
+    next: "2026-02-17"
+  - name: "Board update"
+    frequency: "monthly"
+    next: "2026-02-28"
+
+last_update: "2026-02-14"

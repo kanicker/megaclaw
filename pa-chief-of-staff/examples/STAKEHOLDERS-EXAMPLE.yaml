@@ -1,8 +1,26 @@
+# STAKEHOLDERS.yaml — Example (populated)
+
 stakeholders:
   - name: "Alex Rivera"
-    org: "Key customer"
+    organization: "Key customer (Acme Corp)"
     role: "VP Operations"
-    tier: A
-    last_contact: 2026-02-05
-    next_touch: 2026-02-13
-    notes: "Wants stronger SLAs and clearer roadmap"
+    tier: "A"
+    last_touch: "2026-02-05"
+    next_touch: "2026-02-13"
+    context: "Wants stronger SLAs and clearer roadmap. Renewal at risk if unaddressed by March."
+
+  - name: "Jordan Chen"
+    organization: "Board member"
+    role: "Lead independent director"
+    tier: "A"
+    last_touch: "2026-02-01"
+    next_touch: "2026-02-15"
+    context: "Focused on burn rate. Expects monthly update with clear metrics."
+
+  - name: "Sam Torres"
+    organization: "Engineering"
+    role: "VP Engineering"
+    tier: "B"
+    last_touch: "2026-02-10"
+    next_touch: "2026-02-20"
+    context: "Aligned on technical direction. Needs headcount clarity for Q2 planning."
