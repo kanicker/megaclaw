@@ -1,0 +1,44 @@
+# DEPT-STATE.yaml — COMMUNITY
+# Owner: community agent
+# This file is authoritative for community domain state.
+
+department:
+  name: COMMUNITY
+  agent_id: community
+  last_updated: ""
+  last_heartbeat: ""
+
+priorities:
+  # Populated during onboarding or by the agent. Provenance required.
+  # - id: P-001
+  #   title: ""
+  #   linked_goal: ""  # GOAL-ID from COMPANY-GOALS.yaml
+  #   status: draft_pending_approval | active | completed
+  #   source: cos_onboarding | founder | agent_heartbeat
+  #   confidence: low | med | high
+  #   created_at: ""
+  #   due: ""
+
+active_work: []
+  # - description: ""
+  #   status: in_progress | blocked | completed
+
+risks_and_blockers: []
+  # - risk: ""
+  #   severity: low | medium | high | critical
+  #   mitigation: ""
+
+trust_calibration:
+  loops_completed: 0
+  scope_breaches: 0
+  artifacts_delivered: 0
+  artifacts_expected: 0
+  average_founder_satisfaction: null
+  last_scored: ""
+
+capacity:
+  team_size: 0
+  constraints: []
+
+local_decisions: []
+requests_to_board_room: []

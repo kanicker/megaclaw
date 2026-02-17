@@ -1,0 +1,120 @@
+# POLICY.yaml — Startup Authority Model and Governance
+# This file defines who can do what. It is the single reference for permissions,
+# budgets, escalation rules, and guardrails. All agents read this.
+
+version: 2.0.0
+
+# === AUTHORITY HIERARCHY ===
+authority:
+  founder:
+    type: human
+    decision_authority: ultimate
+    can_override: all
+  chief_of_staff:
+    type: ai
+    agent_id: cos
+    decision_authority: integrative
+    write_scope:
+      - agents/cos/**
+      - shared/decisions/**
+    can_resolve_without_founder:
+      - request_triage
+      - low_stakes_scheduling
+    requires_founder_approval:
+      - company_goal_changes
+      - cross_department_conflict_resolution
+      - budget_or_spend_authorization
+      - strategic_direction_changes
+  department_head:
+    type: ai
+    decision_authority: local
+    write_scope: agents/{own_id}/**
+    shared_write: shared/requests/**
+    requires_escalation:
+      - cross_department_impact
+      - irreversible_actions
+      - budget_implications
+
+# === BASELINE AUTONOMY BUDGETS ===
+baseline_autonomy:
+  daily_heartbeat_budget: 15  # turns per daily cycle, hard cap
+  burst_multiplier:
+    enabled: true
+    max_multiplier: 3
+    max_duration_hours: 72
+    requires_approval: startup_pulse  # approved via pulse, auto-reverts
+  request_budget_weekly: 10  # outgoing requests per agent per week
+
+  # Per-agent overrides (uncomment to customize)
+  # overrides:
+  #   engineering:
+  #     daily_heartbeat_budget: 25
+  #   finance:
+  #     daily_heartbeat_budget: 10
+
+# === TRUST CALIBRATION ===
+trust_calibration:
+  scoring_dimensions:
+    - scope_adherence      # yes/no
+    - artifact_delivery    # yes/no
+    - escalation_rate      # ratio
+    - founder_satisfaction  # 1-3 (optional)
+  widen_threshold: 3   # consecutive all-pass loops to recommend widening
+  narrow_threshold: 2  # loops with breach to recommend narrowing
+  founder_override: always
+
+# === REQUEST QUALITY GATE ===
+request_quality:
+  required_fields:
+    - what_needed
+    - what_tried
+    - why_blocked
+  bounce_on_missing: true
+  dependency_conversion_threshold: 2  # same topic between same agents
+
+# === COS OVERLOAD DETECTION ===
+cos_overload:
+  decision_threshold: 10  # pending decisions in pulse
+  consecutive_sessions: 3  # how many sessions before flagging
+  action: flag_organizational_overload
+
+# === CROSS-DOMAIN RULES ===
+guardrails:
+  cross_domain_writes: forbidden
+  silent_state_merge: forbidden
+  sync_skipping: forbidden
+  unreported_deviation: escalation_trigger
+  irreversible_action_without_grant: forbidden
+
+# === ESCALATION RULES ===
+escalation:
+  escalated_by: cos
+  escalated_to: founder
+  required_when:
+    - material_goal_conflict
+    - budget_or_capacity_breach
+    - repeated_misalignment
+    - unresolved_cross_department_request
+  resolution_record: shared/decisions/
+
+# === SYNC CADENCE ===
+sync:
+  weekly_sync: friday   # day of week, or "on_request"
+  startup_pulse: every_session
+  daily_heartbeat: business_days  # mon-fri
+
+# === INVARIANTS ===
+invariants:
+  state_is_truth: >
+    GLOBAL-STATE.yaml is the canonical ledger. DEPT-STATE.yaml files are
+    domain state owned by each agent. COMPANY-GOALS.yaml is the strategic
+    reference. Chat is transport, not authority. Narrative memory is not
+    authoritative.
+  provenance_required: >
+    Any item written by automated processes (onboarding, sync, heartbeat)
+    must carry source, status, confidence, and created_at fields. No agent
+    treats draft_pending_approval items as active commitments.
+  human_authority_preserved: >
+    The founder is the ultimate authority. No agent acts on consequential
+    decisions without explicit founder approval. Graduated authorization
+    widens scope over time but never removes the founder's override.

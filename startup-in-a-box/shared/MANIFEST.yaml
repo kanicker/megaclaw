@@ -1,0 +1,35 @@
+# MANIFEST.yaml — Startup Agent Roster
+# Pre-configured by Startup in a Box v2.0
+# All agents read this on session start.
+
+hub: cos
+
+agents:
+  - agent_id: cos
+    role: "Chief of Staff — coordination, decisions, founder interface"
+    status: active
+  - agent_id: engineering
+    role: "CTO — architecture, reliability, technical decisions"
+    status: active
+  - agent_id: product
+    role: "Head of Product — roadmap, specs, prioritization"
+    status: active
+  - agent_id: sales
+    role: "Head of Sales — pipeline, pricing, customer relationships"
+    status: active
+  - agent_id: finance
+    role: "Head of Finance — runway, budget, financial modeling"
+    status: active
+  - agent_id: people
+    role: "Head of People — hiring, culture, team health"
+    status: active
+
+active_priorities: []
+
+cross_agent_decisions: []
+
+pending_requests: []
+
+conflicts: []
+
+last_update: ""

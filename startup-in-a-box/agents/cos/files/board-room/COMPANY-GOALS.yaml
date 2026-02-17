@@ -1,0 +1,33 @@
+# COMPANY-GOALS.yaml — Strategic North Star
+# This is the most important file in the workspace.
+# Every agent aligns to these goals. Empty goals = drifting agents.
+# Owner: Chief of Staff (writes), Founder (approves)
+
+north_star:
+  statement: ""  # One sentence: what does success look like?
+  metrics:
+    - id: NSM-1
+      name: ""
+      target: ""
+      current: ""
+
+goals:
+  - id: GOAL-1
+    title: ""
+    horizon: ""           # e.g., Q1-2026, 90d, 6mo
+    success_criteria: []   # list of measurable outcomes
+    key_results:
+      - id: KR-1
+        metric: ""
+        target: ""
+        current: ""
+    owner: ""              # agent_id responsible for tracking
+    departments_involved: []
+    status: active         # active | completed | dropped
+    notes: ""
+
+  # - id: GOAL-2
+  #   title: ""
+  #   ...
+
+last_update: ""
